@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
     shade(kotlin("stdlib-jdk7"))
+    shade("org.jetbrains:annotations:20.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.1")
