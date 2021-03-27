@@ -124,7 +124,7 @@ object Renderer : TileEntitySpecialRenderer<TestTile>() {
             state.getBone(i).pos = Vec3f(0f, time / 4, time / 4)
         }
         bonedModel.drawStaticPart()
-        bonedModel.drawBonedPart(state)
+         bonedModel.drawBonedPart(state, true)
 
         /*
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL)
