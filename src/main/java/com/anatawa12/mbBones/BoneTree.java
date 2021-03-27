@@ -67,6 +67,10 @@ public class BoneTree {
         return getById(bone.id) == bone;
     }
 
+    public int boneCount() {
+        return boneList.length;
+    }
+
     public static class Bone {
         public final int id;
         public final @Nullable String name;
@@ -129,33 +133,6 @@ public class BoneTree {
          */
         public Vec4f asRelative(Vec4f global) {
             return times(global, rotInverted);
-        }
-
-        /**
-         * convert the relative position to global position to this bone.
-         * @param relative the relative positon
-         * @return relative position to this bone
-         */
-        public Vec3f asGlobal(Vec3f relative) {
-            return asGlobalDirection(relative).add(pos);
-        }
-
-        /**
-         * convert the relative direction vector to global direction vector to this bone.
-         * @param relative the relative direction vector
-         * @return direction vector to this bone
-         */
-        public Vec3f asGlobalDirection(Vec3f relative) {
-            return rotate(rot, relative);
-        }
-
-        /**
-         * convert the relative rotation quaternion to global rotation quaternion to this bone.
-         * @param relative the relative rotation quaternion
-         * @return rotation quaternion to this bone
-         */
-        public Vec4f asGlobal(Vec4f relative) {
-            return times(relative, rot);
         }
     }
 

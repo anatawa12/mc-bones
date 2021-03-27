@@ -46,7 +46,10 @@ public class BonedModel {
         Tessellator.getInstance().draw();
     }
 
-    public void drawBonedPart() {
+    public void drawBonedPart(BoneTreeState state) {
+        if (state.target != boneTree)
+            throw new IllegalArgumentException("the state is not for tree of this");
+        BoneTreeState.ComputedBone[] computed = state.compute();
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL11.GL_TRIANGLES, VERTEX_FORMAT);
         while (bonedPart.remaining() != 0) {
@@ -67,7 +70,7 @@ public class BonedModel {
                         .endVertex();
             } else {
                 // currently use global one
-                BoneTree.Bone bone = boneTree.getById(boneIndex);
+                BoneTreeState.ComputedBone bone = computed[boneIndex];
                 Vec3f vertex = bone.asGlobal(new Vec3f(vertex_x, vertex_y, vertex_z));
                 Vec3f normal = bone.asGlobalDirection(new Vec3f(normal_x, normal_y, normal_z));
                 buffer.pos(vertex.x, vertex.y, vertex.z)
