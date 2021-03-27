@@ -1,4 +1,4 @@
-import net.minecraftforge.gradle.user.patcherUser.forge.ForgeExtension
+import net.minecraftforge.gradle.user.patch.UserPatchExtension
 
 buildscript {
     repositories {
@@ -11,8 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        // required by ForgeGradle. see anatawa12/ForgeGradle-2.3#22
-        classpath("com.anatawa12.forge:ForgeGradle:2.3-1.0.+") {
+        classpath("com.anatawa12.forge:ForgeGradle:1.2-1.0.+") {
             isChanging = true
         }
     }
@@ -24,32 +23,28 @@ plugins {
     kotlin("jvm")
 }
 
-apply(plugin = "net.minecraftforge.gradle.forge")
+apply(plugin = "forge")
 
 version = property("modVersion")!!
 group = property("modGroup")!!
 base { archivesBaseName = property("modBaseName")!!.toString() }
 
-val Project.minecraft: ForgeExtension get() =
-    (this as ExtensionAware).extensions.getByName("minecraft") as ForgeExtension
-fun Project.minecraft(configure: ForgeExtension.() -> Unit): Unit =
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+val Project.minecraft: UserPatchExtension get() =
+    (this as ExtensionAware).extensions.getByName("minecraft") as UserPatchExtension
+fun Project.minecraft(configure: UserPatchExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("minecraft", configure)
 
 minecraft {
-    version = project.property("forgeVersion1.12.2").toString()
+    version = project.property("forgeVersion1.7.10").toString()
     runDir = "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = project.property("mcpVersion1.12.2").toString()
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
 val shade by configurations.creating
-configurations.compile.get().extendsFrom(shade)
+configurations.implementation.get().extendsFrom(shade)
 
 repositories {
     mavenCentral()
