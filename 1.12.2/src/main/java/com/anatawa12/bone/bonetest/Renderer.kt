@@ -3,6 +3,7 @@ package com.anatawa12.bone.bonetest
 import com.anatawa12.mbBones.BoneTree
 import com.anatawa12.mbBones.BoneTreeState
 import com.anatawa12.mbBones.BonedModel
+import com.anatawa12.mbBones.BonedModelRenderer
 import com.anatawa12.mbBones.math.Quot
 import com.anatawa12.mbBones.math.Vec2f
 import com.anatawa12.mbBones.math.Vec3f
@@ -123,8 +124,8 @@ object Renderer : TileEntitySpecialRenderer<TestTile>() {
             state.getBone(i).rot = Quot.fromOiler(0f, time * 30, 0f)
             state.getBone(i).pos = Vec3f(0f, time / 4, time / 4)
         }
-        bonedModel.drawStaticPart()
-         bonedModel.drawBonedPart(state, true)
+        BonedModelRenderer.drawStaticPart(bonedModel, )
+        BonedModelRenderer.drawBonedPart(bonedModel, state, true)
 
         /*
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL)
