@@ -2,14 +2,8 @@ package com.anatawa12.mbBones;
 
 import com.anatawa12.mbBones.math.Vec2f;
 import com.anatawa12.mbBones.math.Vec3f;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -17,11 +11,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class BonedModel {
-    private final BoneTree boneTree;
+    final BoneTree boneTree;
     /**
      * built buffer for static part
      */
-    private final @NotNull ByteBuffer staticPart;
+    final @NotNull ByteBuffer staticPart;
 
     /**
      * boned triangles
@@ -37,103 +31,7 @@ public class BonedModel {
      * 22..22: byte: normal z (signed)
      * 23..23: byte: bone index
      */
-    private final @NotNull ByteBuffer bonedPart;
-
-    public void drawStaticPart() {
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL11.GL_TRIANGLES, VERTEX_FORMAT);
-        buffer.putBulkData(staticPart);
-        staticPart.position(0);
-        Tessellator.getInstance().draw();
-    }
-
-    public void drawBonedPart(BoneTreeState state) {
-        drawBonedPart(state, false);
-    }
-
-    public void drawBonedPart(BoneTreeState state, boolean boneSkeleton) {
-        if (state.target != boneTree)
-            throw new IllegalArgumentException("the state is not for tree of this");
-        BoneTreeState.ComputedBone[] computed = state.compute();
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL11.GL_TRIANGLES, VERTEX_FORMAT);
-        while (bonedPart.remaining() != 0) {
-            float vertex_x = bonedPart.getFloat();
-            float vertex_y = bonedPart.getFloat();
-            float vertex_z = bonedPart.getFloat();
-            float uv_u = bonedPart.getFloat();
-            float uv_v = bonedPart.getFloat();
-            float normal_x = bonedPart.get() / 127f;
-            float normal_y = bonedPart.get() / 127f;
-            float normal_z = bonedPart.get() / 127f;
-            int boneIndex = (int)bonedPart.get() & 0xFF;
-            if (boneIndex == 0) {
-                // fast path: global
-                buffer.pos(vertex_x, vertex_y, vertex_z)
-                        .tex(uv_u, uv_v)
-                        .normal(normal_x, normal_y, normal_z)
-                        .endVertex();
-            } else {
-                // currently use global one
-                BoneTreeState.ComputedBone bone = computed[boneIndex];
-                Vec3f vertex = bone.asGlobal(new Vec3f(vertex_x, vertex_y, vertex_z));
-                Vec3f normal = bone.asGlobalDirection(new Vec3f(normal_x, normal_y, normal_z));
-                buffer.pos(vertex.x, vertex.y, vertex.z)
-                        .tex(uv_u, uv_v)
-                        .normal(normal.x, normal.y, normal.z)
-                        .endVertex();
-            }
-        }
-        bonedPart.position(0);
-        Tessellator.getInstance().draw();
-        if (boneSkeleton)
-            drawBoneSkeleton(computed);
-    }
-
-    private void drawBoneSkeleton(BoneTreeState.ComputedBone[] computed) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableLighting();
-        GlStateManager.glLineWidth(2);
-
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-        for (BoneTree.Bone child : boneTree.getRoot().children) {
-            drawBoneSkeleton(buffer, computed, child, null);
-        }
-
-        Tessellator.getInstance().draw();
-
-        GlStateManager.enableLighting();
-        GlStateManager.enableTexture2D();
-    }
-
-    private void drawBoneSkeleton(BufferBuilder buffer, BoneTreeState.ComputedBone[] computedList,
-                                  BoneTree.Bone bone, BoneTreeState.ComputedBone parent) {
-        BoneTreeState.ComputedBone computed = computedList[bone.id];
-        float size = 0.25f;
-
-        Vec3f o = computed.asGlobal(Vec3f.ORIGIN);
-        Vec3f x = computed.asGlobal(new Vec3f(size, 0, 0));
-        Vec3f y = computed.asGlobal(new Vec3f(0, size, 0));
-        Vec3f z = computed.asGlobal(new Vec3f(0, 0, size));
-        if (parent != null) {
-            Vec3f p = parent.asGlobal(Vec3f.ORIGIN);
-
-            buffer.pos(o.x, o.y, o.z).color(0f, 1f, 1f, 1f).endVertex();
-            buffer.pos(p.x, p.y, p.z).color(0f, 1f, 1f, 1f).endVertex();
-        }
-        buffer.pos(o.x, o.y, o.z).color(1f, 0f, 0f, 1f).endVertex();
-        buffer.pos(x.x, x.y, x.z).color(1f, 0f, 0f, 1f).endVertex();
-        buffer.pos(o.x, o.y, o.z).color(0f, 1f, 0f, 1f).endVertex();
-        buffer.pos(y.x, y.y, y.z).color(0f, 1f, 0f, 1f).endVertex();
-        buffer.pos(o.x, o.y, o.z).color(0f, 1f, 0f, 1f).endVertex();
-        buffer.pos(z.x, z.y, z.z).color(0f, 0f, 1f, 1f).endVertex();
-
-        for (BoneTree.Bone child : bone.children) {
-            drawBoneSkeleton(buffer, computedList, child, computed);
-        }
-    }
+    final @NotNull ByteBuffer bonedPart;
 
     private BonedModel(BoneTree boneTree, @NotNull ByteBuffer staticPart, @NotNull ByteBuffer bonedPart) {
         this.boneTree = boneTree;
@@ -169,13 +67,10 @@ public class BonedModel {
                 this.uv = uv;
             }
 
-            private void addTo(BufferBuilder buffer) {
-                buffer.pos(relativePos.x, relativePos.y, relativePos.z)
-                        .tex(uv.x, uv.y)
-                        .normal(normal.x, normal.y, normal.z)
-                        .endVertex();
-            }
-
+            /**
+             * POSITION_3F, TEX_2F, NORMAL_3B, BONE_1B
+             * @param buffer the buffer this vertex will be added to
+             */
             private void addTo(ByteBuffer buffer) {
                 buffer.putFloat(relativePos.x);
                 buffer.putFloat(relativePos.y);
@@ -262,30 +157,22 @@ public class BonedModel {
                 }
             }
 
-            BufferBuilder staticPartBuffer = new BufferBuilder(VERTEX_FORMAT.getIntegerSize() * (staticPart.size() * 3 + 1));
-            staticPartBuffer.begin(GL11.GL_TRIANGLES, VERTEX_FORMAT);
-            for (Triangle triangle : staticPart) {
-                triangle.point1.addTo(staticPartBuffer);
-                triangle.point2.addTo(staticPartBuffer);
-                triangle.point3.addTo(staticPartBuffer);
-            }
-            staticPartBuffer.finishDrawing();
-
-            ByteBuffer bonedPartBuffer = ByteBuffer.allocate(24 * 3 * bonedPart.size());
-            for (Triangle triangle : bonedPart) {
-                triangle.point1.addTo(bonedPartBuffer);
-                triangle.point2.addTo(bonedPartBuffer);
-                triangle.point3.addTo(bonedPartBuffer);
-            }
-            bonedPartBuffer.flip();
-
             return new BonedModel(
                     boneTree,
-                    staticPartBuffer.getByteBuffer(),
-                    bonedPartBuffer
+                    addTrianglesToBuffer(staticPart),
+                    addTrianglesToBuffer(bonedPart)
             );
         }
-    }
 
-    static VertexFormat VERTEX_FORMAT = DefaultVertexFormats.POSITION_TEX_NORMAL;
+        private ByteBuffer addTrianglesToBuffer(List<Triangle> bonedPart) {
+            ByteBuffer buffer = ByteBuffer.allocate(24 * 3 * bonedPart.size());
+            for (Triangle triangle : bonedPart) {
+                triangle.point1.addTo(buffer);
+                triangle.point2.addTo(buffer);
+                triangle.point3.addTo(buffer);
+            }
+            buffer.flip();
+            return buffer;
+        }
+    }
 }
