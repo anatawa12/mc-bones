@@ -32,6 +32,7 @@ public class MqoFile {
     private static class Object {
         final @NotNull String name;
         int uid;
+        final boolean glowShading;
         final @NotNull Vertex @NotNull [] vertices;
         final @NotNull Face @NotNull [] faces;
 
@@ -40,10 +41,12 @@ public class MqoFile {
 
         private Object(@NotNull String name,
                        int uid,
+                       boolean glowShading,
                        @NotNull Vertex @NotNull [] vertices,
                        @NotNull Face @NotNull [] faces) {
             this.name = name;
             this.uid = uid;
+            this.glowShading = glowShading;
             this.vertices = vertices;
             this.faces = faces;
         }
@@ -155,12 +158,18 @@ public class MqoFile {
 
     private Object readObjectChunk(MqoReader reader, String name) throws IOException {
         int uid = -1;
+        boolean glowShading = false;
         @NotNull Vertex @Nullable [] vertices = null;
         @NotNull Face @Nullable [] faces = null;
         while (!reader.lookaheadCloseChunk()) {
             switch (reader.readToken().toLowerCase(Locale.ROOT)) {
                 case "uid": {
                     uid = reader.readInt();
+                    reader.nextLine();
+                    break;
+                }
+                case "shading": {
+                    glowShading = reader.readInt() == 1;
                     reader.nextLine();
                     break;
                 }
@@ -206,6 +215,7 @@ public class MqoFile {
         return new Object(
                 name,
                 uid,
+                glowShading,
                 vertices,
                 faces
         );
