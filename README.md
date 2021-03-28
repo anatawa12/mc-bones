@@ -1,4 +1,6 @@
-# the test project for bone supported model renderer
+# MC-bones
+
+The project to support bone
 
 ## features
 - bone support
