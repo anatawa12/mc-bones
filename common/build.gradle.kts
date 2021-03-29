@@ -1,0 +1,36 @@
+plugins {
+    kotlin("jvm")
+    java
+}
+
+version = property("modVersion")!!
+group = property("modGroup")!!
+base { archivesBaseName = property("modBaseName")!!.toString() }
+
+tasks.compileKotlin {
+    kotlinOptions {
+        noStdlib = true
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly(kotlin("stdlib"))
+    compileOnly(project(":"))
+    compileOnly("org.jetbrains:annotations:20.1.0")
+    compileOnly("com.google.guava:guava:17.0")
+    compileOnly("org.lwjgl.lwjgl:lwjgl:2.9.1")
+
+    testImplementation(kotlin("stdlib"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}

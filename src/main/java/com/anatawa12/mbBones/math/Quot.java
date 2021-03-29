@@ -67,4 +67,19 @@ public class Quot {
         float w = +hSin * pSin * bSin + hCos * pCos * bCos;
         return new Vec4f(x, y, z, w);
     }
+
+    /**
+     * @param axis the rotation axis
+     * @param rad the rotation degree in radian
+     */
+    public static Vec4f rotationRad(Vec3f axis, float rad) {
+        Vec3f normedAxis = axis.normalized();
+        float sinHarfPhi = (float) Math.sin(rad / 2);
+        return new Vec4f(
+                normedAxis.x * sinHarfPhi,
+                normedAxis.y * sinHarfPhi,
+                normedAxis.z * sinHarfPhi,
+                (float) Math.cos(rad / 2)
+        );
+    }
 }

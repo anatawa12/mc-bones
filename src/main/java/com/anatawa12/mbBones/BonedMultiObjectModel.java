@@ -33,8 +33,9 @@ public class BonedMultiObjectModel {
             this.tree = tree;
         }
 
-        public void addObject(BonedObject obj) {
+        public Builder addObject(BonedObject obj) {
             builder.put(obj.name, obj);
+            return this;
         }
 
         public BonedMultiObjectModel build() {
