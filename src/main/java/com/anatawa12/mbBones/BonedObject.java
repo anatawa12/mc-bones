@@ -10,12 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BonedModel {
+public class BonedObject {
     final BoneTree boneTree;
     /**
      * built buffer for static part
      */
     final @NotNull ByteBuffer staticPart;
+
+    /**
+     * built buffer for static part
+     */
+    final @NotNull String name;
 
     /**
      * boned triangles
@@ -33,8 +38,9 @@ public class BonedModel {
      */
     final @NotNull ByteBuffer bonedPart;
 
-    private BonedModel(BoneTree boneTree, @NotNull ByteBuffer staticPart, @NotNull ByteBuffer bonedPart) {
-        this.boneTree = boneTree;
+    private BonedObject(Builder builder, @NotNull ByteBuffer staticPart, @NotNull ByteBuffer bonedPart) {
+        this.boneTree = builder.boneTree;
+        this.name = Objects.requireNonNull(builder.name, "name");
         this.staticPart = staticPart;
         this.bonedPart = bonedPart;
     }
@@ -47,6 +53,7 @@ public class BonedModel {
         private final BoneTree boneTree;
         private final List<Point> points = new ArrayList<>();
         private final List<Triangle> triangles = new ArrayList<>();
+        private @Nullable String name;
 
         private Builder(BoneTree boneTree) {
             this.boneTree = Objects.requireNonNull(boneTree);
@@ -140,12 +147,16 @@ public class BonedModel {
             triangles.add(triangle);
         }
 
+        public void setName(@NotNull String name) {
+            this.name = name;
+        }
+
         /**
          * Builds this BonedModel. this process is a little heavy.
          *
          * @return built boned model.
          */
-        public BonedModel build() {
+        public BonedObject build() {
             List<Triangle> staticPart = new ArrayList<>();
             List<Triangle> bonedPart = new ArrayList<>();
 
@@ -157,8 +168,8 @@ public class BonedModel {
                 }
             }
 
-            return new BonedModel(
-                    boneTree,
+            return new BonedObject(
+                    this,
                     addTrianglesToBuffer(staticPart),
                     addTrianglesToBuffer(bonedPart)
             );

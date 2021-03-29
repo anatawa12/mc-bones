@@ -14,7 +14,7 @@ public class BonedModelRenderer {
     private BonedModelRenderer() {
     }
 
-    public static void drawStaticPart(BonedModel model) {
+    public static void drawStaticPart(BonedObject model) {
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL11.GL_TRIANGLES, VERTEX_FORMAT);
         buffer.putBulkData(model.staticPart);
@@ -22,11 +22,11 @@ public class BonedModelRenderer {
         Tessellator.getInstance().draw();
     }
 
-    public static void drawBonedPart(BonedModel model, BoneTreeState state) {
+    public static void drawBonedPart(BonedObject model, BoneTreeState state) {
         drawBonedPart(model, state, false);
     }
 
-    public static void drawBonedPart(BonedModel model, BoneTreeState state, boolean boneSkeleton) {
+    public static void drawBonedPart(BonedObject model, BoneTreeState state, boolean debug) {
         if (state.target != model.boneTree)
             throw new IllegalArgumentException("the state is not for tree of model");
         BoneTreeState.ComputedBone[] computed = state.compute();
@@ -62,11 +62,11 @@ public class BonedModelRenderer {
         }
         bonedPart.position(0);
         Tessellator.getInstance().draw();
-        if (boneSkeleton)
+        if (debug) {
             drawBoneSkeleton(model, computed);
     }
 
-    private static void drawBoneSkeleton(BonedModel model, BoneTreeState.ComputedBone[] computed) {
+    private static void drawBoneSkeleton(BonedObject model, BoneTreeState.ComputedBone[] computed) {
         GlStateManager.disableTexture2D();
         GlStateManager.disableLighting();
         GlStateManager.glLineWidth(2);
