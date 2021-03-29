@@ -49,7 +49,7 @@ public class Vec3f {
     }
 
     public @NotNull float norm() {
-        return x * x + y * y + z * z;
+        return (float)Math.sqrt(x * x + y * y + z * z);
     }
 
     public @NotNull Vec3f normalized() {

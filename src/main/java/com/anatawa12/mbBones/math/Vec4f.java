@@ -50,7 +50,7 @@ public class Vec4f {
     }
 
     public @NotNull float norm() {
-        return x * x + y * y + z * z + w * w;
+        return (float)Math.sqrt(x * x + y * y + z * z + w * w);
     }
 
     public @NotNull Vec4f normalized() {

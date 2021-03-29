@@ -46,7 +46,7 @@ public class Vec2f {
     }
 
     public @NotNull float norm() {
-        return x * x + y * y;
+        return (float)Math.sqrt(x * x + y * y);
     }
 
     public @NotNull Vec2f normalized() {
