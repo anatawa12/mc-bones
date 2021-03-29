@@ -24,6 +24,7 @@ import static com.anatawa12.mbBones.math.Quot.times;
 
 public class BoneTree {
     private final @NotNull @Unmodifiable Map<@NotNull String, @NotNull Bone> byName;
+    private final @NotNull @Unmodifiable Map<@NotNull Integer, @NotNull Bone> byExternalId;
     private final @NotNull Bone root;
     private final @NotNull Bone @NotNull[] boneList;
 
@@ -35,16 +36,20 @@ public class BoneTree {
 
         @NotNull Bone @NotNull[] boneList = new Bone[bones.size()];
         ImmutableMap.Builder<@NotNull String, @NotNull Bone> byName = ImmutableMap.builder();
+        ImmutableMap.Builder<@NotNull Integer, @NotNull Bone> byExternalId = ImmutableMap.builder();
         for (Bone bone : bones) {
             if (bone.id >= boneList.length)
                 throw new IllegalArgumentException("bone id out of range: 0..<" + boneList.length + ": " + bone.id);
             boneList[bone.id] = bone;
             if (bone.name != null)
                 byName.put(bone.name, bone);
+            if (bone.externalId != Integer.MIN_VALUE)
+                byExternalId.put(bone.externalId, bone);
         }
 
         this.boneList = boneList;
         this.byName = byName.build();
+        this.byExternalId = byExternalId.build();
     }
 
     public @NotNull @Unmodifiable Map<@NotNull String, @NotNull Bone> getBoneByName() {
@@ -53,6 +58,10 @@ public class BoneTree {
 
     public @NotNull Bone getById(int id) {
         return boneList[id];
+    }
+
+    public @Nullable Bone getByExternalId(int id) {
+        return byExternalId.get(id);
     }
 
     public @Nullable Bone getByName(String name) {
@@ -73,6 +82,7 @@ public class BoneTree {
 
     public static class Bone {
         public final int id;
+        public final int externalId;
         public final @Nullable String name;
         public final @NotNull Vec3f pos;
         public final @NotNull Vec4f rot;
@@ -89,6 +99,7 @@ public class BoneTree {
             Objects.requireNonNull(builder.pos, "pos of bone #" + builder.id);
             Objects.requireNonNull(builder.rot, "rot of bone #" + builder.id);
             this.id = builder.id;
+            this.externalId = builder.externalId;
             this.name = builder.name;
             this.pos = builder.pos;
             this.rot = builder.rot;
@@ -147,6 +158,7 @@ public class BoneTree {
         private @Nullable String name;
         private @Nullable Vec3f pos;
         private @Nullable Vec4f rot;
+        private int externalId = Integer.MIN_VALUE;
 
         public final int id;
 
@@ -208,6 +220,11 @@ public class BoneTree {
             }
             this.parent = parent;
             parent.children.add(this);
+            return this;
+        }
+
+        public Builder setExternalId(int externalId) {
+            this.externalId = externalId;
             return this;
         }
 
