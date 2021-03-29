@@ -64,6 +64,8 @@ public class BonedModelRenderer {
         Tessellator.getInstance().draw();
         if (debug) {
             drawBoneSkeleton(model, computed);
+            drawNormalVector(model, computed);
+        }
     }
 
     private static void drawBoneSkeleton(BonedObject model, BoneTreeState.ComputedBone[] computed) {
@@ -109,6 +111,51 @@ public class BonedModelRenderer {
         for (BoneTree.Bone child : bone.children) {
             drawBoneSkeleton(buffer, computedList, child, computed);
         }
+    }
+
+    private static void drawNormalVector(BonedObject model, BoneTreeState.ComputedBone[] computed) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableLighting();
+        GlStateManager.glLineWidth(2);
+
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+        ByteBuffer bonedPart = model.bonedPart;
+        while (model.bonedPart.remaining() != 0) {
+            float vertex_x = bonedPart.getFloat();
+            float vertex_y = bonedPart.getFloat();
+            float vertex_z = bonedPart.getFloat();
+            float uv_u = bonedPart.getFloat();
+            float uv_v = bonedPart.getFloat();
+            float normal_x = bonedPart.get() / 127f;
+            float normal_y = bonedPart.get() / 127f;
+            float normal_z = bonedPart.get() / 127f;
+            int boneIndex = (int)bonedPart.get() & 0xFF;
+
+
+            if (boneIndex == 0) {
+                float normal_x1 = normal_x / 8;
+                float normal_y1 = normal_y / 8;
+                float normal_z1 = normal_z / 8;
+                // fast path: global
+                buffer.pos(vertex_x, vertex_y, vertex_z)
+                        .color(0f, 1f, 1f, 1f).endVertex();
+                buffer.pos(vertex_x + normal_x1, vertex_y + normal_y1, vertex_z + normal_z1)
+                        .color(0f, 1f, 1f, 1f).endVertex();
+            } else {
+                // currently use global one
+                BoneTreeState.ComputedBone bone = computed[boneIndex];
+                Vec3f vertex = bone.asGlobal(new Vec3f(vertex_x, vertex_y, vertex_z));
+                Vec3f vertex1 = vertex.add(bone.asGlobalDirection(new Vec3f(normal_x, normal_y, normal_z)).div(8));
+                buffer.pos(vertex.x, vertex.y, vertex.z).color(0f, 1f, 1f, 1f).endVertex();
+                buffer.pos(vertex1.x, vertex1.y, vertex1.z).color(0f, 1f, 1f, 1f).endVertex();
+            }
+        }
+        bonedPart.position(0);
+        Tessellator.getInstance().draw();
+
+        GlStateManager.enableLighting();
+        GlStateManager.enableTexture2D();
     }
 
     static VertexFormat VERTEX_FORMAT = DefaultVertexFormats.POSITION_TEX_NORMAL;
