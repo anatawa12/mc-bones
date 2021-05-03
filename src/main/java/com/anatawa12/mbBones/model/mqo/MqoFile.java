@@ -136,7 +136,7 @@ public class MqoFile {
         ) {
             Vertex vertex = face.vertices[index];
             Vec2f uv = face.uvs == null ? Vec2f.ORIGIN : face.uvs[index];
-            BoneTree.Bone bone = this.bone && vertex.bone == null ? tree.getRoot()
+            BoneTree.Bone bone = !this.bone || vertex.bone == null ? tree.getRoot()
                     : tree.getByExternalId(vertex.bone.boneId);
             return builder.addPoint(
                     bone,
@@ -436,6 +436,8 @@ public class MqoFile {
         // for glow shading
         if (object.glowShading) {
             computeNormalVectorsForGlowShading(object);
+        } else {
+            computeNormalVectors(object);
         }
     }
 
