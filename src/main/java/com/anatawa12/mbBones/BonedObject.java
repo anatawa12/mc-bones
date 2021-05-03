@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -177,6 +178,7 @@ public class BonedObject {
 
         private ByteBuffer addTrianglesToBuffer(List<Triangle> bonedPart) {
             ByteBuffer buffer = ByteBuffer.allocate(24 * 3 * bonedPart.size());
+            buffer.order(ByteOrder.nativeOrder());
             for (Triangle triangle : bonedPart) {
                 triangle.point1.addTo(buffer);
                 triangle.point2.addTo(buffer);
