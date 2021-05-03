@@ -407,7 +407,7 @@ public class MqoFile {
                     Vec3f p0 = face.vertices[0].pos;
                     Vec3f p1 = face.vertices[1].pos;
                     Vec3f p2 = face.vertices[2].pos;
-                    normal = cross(p0.sub(p1), p0.sub(p2));
+                    normal = cross(p0.sub(p2), p0.sub(p1));
                     break;
                 }
                 case 4: {
