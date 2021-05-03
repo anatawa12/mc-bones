@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -464,6 +465,13 @@ public class MqoFile {
                 else
                     face.b.normals[face.a] = normal;
             }
+        }
+    }
+
+    private void computeNormalVectors(Object object) {
+        for (Face face : object.faces) {
+            face.normals = new Vec3f[face.vertices.length];
+            Arrays.fill(face.normals, face.normal);
         }
     }
 
